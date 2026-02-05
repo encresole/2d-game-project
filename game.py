@@ -1,6 +1,5 @@
 import pygame
 
-
 class AnimatedSprite:
     def __init__(self, chemin, lignes, colonnes, toAnimate, vitesse=0.2):
         """
@@ -43,9 +42,9 @@ clock = pygame.time.Clock()
 
 #idle Sprites
 idleDown = AnimatedSprite("PlayerSprite/Unarmed/Idle.png", lignes=4, colonnes=12, vitesse=0.06, toAnimate=(0,1,0,5))
-idleUp= AnimatedSprite("PlayerSprite/Unarmed/Idle.png", lignes=4, colonnes=12, vitesse=0.06, toAnimate=(0,1,0,5))
-idleLeft=AnimatedSprite("PlayerSprite/Unarmed/Idle.png", lignes=4, colonnes=12, vitesse=0.06, toAnimate=(0,1,0,5))
-idleRight=AnimatedSprite("PlayerSprite/Unarmed/Idle.png", lignes=4, colonnes=12, vitesse=0.06, toAnimate=(0,1,0,5))
+idleUp= AnimatedSprite("PlayerSprite/Unarmed/Idle.png", lignes=4, colonnes=12, vitesse=0.06, toAnimate=(3,4,0,1))
+idleLeft=AnimatedSprite("PlayerSprite/Unarmed/Idle.png", lignes=4, colonnes=12, vitesse=0.06, toAnimate=(1,2,0,12))
+idleRight=AnimatedSprite("PlayerSprite/Unarmed/Idle.png", lignes=4, colonnes=12, vitesse=0.06, toAnimate=(2,3,0,12))
 
 #walking Sprites
 walkingDown = AnimatedSprite("PlayerSprite/Unarmed/Run.png", lignes=4, colonnes=8, vitesse=0.15, toAnimate=(0,1,0,8))
@@ -105,22 +104,34 @@ while running:
         x=needReposition[0]
         y=needReposition[1]
 
+    dx = 0
+    dy = 0
+
     if keys[pygame.K_d]:
-        x += speed
-        moving = True
-        lookAt="Right"
+        dx += 1
+        lookAt = "Right"
     if keys[pygame.K_q]:
-        x -= speed
-        moving = True
-        lookAt="Left"
+        dx -= 1
+        lookAt = "Left"
     if keys[pygame.K_s]:
-        y += speed
-        moving = True
-        lookAt="Down"
+        dy += 1
+        lookAt = "Down"
     if keys[pygame.K_z]:
-        y -= speed
+        dy -= 1
+        lookAt = "Up"
+    
+    if dx != 0 or dy != 0:
         moving = True
-        lookAt="Up"
+        length = (dx**2 + dy**2) ** 0.5
+        dx /= length
+        dy /= length
+
+        x += dx * speed
+        y += dy * speed
+    else:
+        moving = False
+
+
     #Start drawing
     screen.fill((255, 255, 255)) 
     #Under the player
@@ -136,7 +147,14 @@ while running:
         else:
             walkingDown.draw(screen,(x,y))
     else:
-        idleDown.draw(screen, (x,y))
+        if lookAt=="Right":
+            idleRight.draw(screen,(x,y))
+        elif lookAt=="Up":
+            idleUp.draw(screen,(x,y))
+        elif lookAt=="Left":
+            idleLeft.draw(screen,(x,y))
+        else:
+            idleDown.draw(screen,(x,y))
     #On the player
     pygame.draw.rect(screen,(0,255,0),(70,50,10,10))
 
