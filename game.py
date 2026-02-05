@@ -1,5 +1,14 @@
 import pygame
 
+class Particle:
+    position=(0,0)
+
+    def __init__(self,chemin,pos):
+        self.sheet=pygame.image.load(chemin).convert_alpha()
+        self.position=pos
+    def draw(self,surface):
+        surface.blit(self.sheet,self.position)
+
 class AnimatedSprite:
     def __init__(self, chemin, lignes, colonnes, toAnimate, vitesse=0.2):
         """
@@ -62,6 +71,8 @@ speed = 2
 running = True
 moving=False
 lookAt="Down"
+
+particleDrawing=[]
 
 def mapBorder(x,y,width,heigth,mapX,mapY):
     ret=[]
@@ -136,15 +147,22 @@ while running:
     screen.fill((255, 255, 255)) 
     #Under the player
     pygame.draw.rect(screen,(255,0,0),(50,50,10,10))
+    if len(particleDrawing)!=0:
+        for particle in particleDrawing:
+            particle.draw(screen)
     #Drawing player
     if moving:
         if lookAt=="Right":
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(playerRect.x,playerRect.y)))
             walkingRight.draw(screen,(x,y))
         elif lookAt=="Up":
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(playerRect.x,playerRect.y)))
             walkingUp.draw(screen,(x,y))
         elif lookAt=="Left":
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(playerRect.x,playerRect.y)))
             walkingLeft.draw(screen,(x,y))
         else:
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(playerRect.x,playerRect.y)))
             walkingDown.draw(screen,(x,y))
     else:
         if lookAt=="Right":
