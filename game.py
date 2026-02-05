@@ -1,5 +1,4 @@
 import pygame
-import time
 
 #game varialbles
 HEIGHT=400
@@ -10,18 +9,28 @@ pygame.init()
 screen = pygame.display.set_mode((600, 400))
 clock = pygame.time.Clock()
 
+
+lastParticleDraw=0
+interval=1000
+
 class Particle:
     position=(0,0)
-    lastParticleDraw=time.time()
+    timeOnScreen=0
+    wasDrawnAt=pygame.time.get_ticks()
     def __init__(self,chemin,pos,offsetX,offsetY):
-        print(time.time())
         self.sheet=pygame.image.load(chemin).convert_alpha()
         self.offsetX=offsetX
         self.offsetY=offsetY
         self.x=pos[0]+offsetX
         self.y=pos[1]+offsetY
+
     def draw(self,surface):
+        global lastParticleDraw
         surface.blit(self.sheet,(self.x,self.y))
+        lastParticleDraw=pygame.time.get_ticks()
+        self.timeOnScreen=pygame.time.get_ticks()-self.wasDrawnAt
+
+
 
 class AnimatedSprite:
     def __init__(self, chemin, lignes, colonnes, toAnimate, vitesse=0.2):
@@ -79,6 +88,8 @@ lookAt="Down"
 
 particleDrawing=[]
 
+
+
 def mapBorder(x,y,width,heigth,mapX,mapY):
     ret=[]
     nothing=True
@@ -105,6 +116,17 @@ def mapBorder(x,y,width,heigth,mapX,mapY):
         return None
     print(ret)
     return ret
+
+
+def particleDisplay(surface):
+    print(len(particleDrawing))
+    for particle in particleDrawing:
+        particle.draw(surface)
+        print(particle.timeOnScreen)
+        if particle.timeOnScreen>1000:
+            particleDrawing.remove(particle)
+
+
 
 while running:
     for event in pygame.event.get():
@@ -137,8 +159,7 @@ while running:
         lookAt = "Up"
     if keys[pygame.K_p]:
         # add variable for debug :
-        print("debug :")
-        print("x=",x," y=",y)
+        print(pygame.time.get_ticks())
     
     if dx != 0 or dy != 0:
         moving = True
@@ -151,27 +172,26 @@ while running:
     else:
         moving = False
 
-
     #Start drawing
-    screen.fill((255, 255, 255)) 
+    screen.fill((0, 200, 255)) 
     #Under the player
     pygame.draw.rect(screen,(255,0,0),(50,50,10,10))
     if len(particleDrawing)!=0:
-        for particle in particleDrawing:
-            particle.draw(screen)
+        if lastParticleDraw-pygame.time.get_ticks()<interval:
+            particleDisplay(screen)
     #Drawing player
     if moving:
         if lookAt=="Right":
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y),10,6))
+            particleDrawing.append(Particle("PlayerSprite/particle-test.png",(x,playerRect.y),10,6))
             walkingRight.draw(screen,(x,y))
         elif lookAt=="Up":
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y),15,6))
+            particleDrawing.append(Particle("PlayerSprite/particle-test.png",(x,playerRect.y),15,6))
             walkingUp.draw(screen,(x,y))
         elif lookAt=="Left":
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y),20,6))
+            particleDrawing.append(Particle("PlayerSprite/particle-test.png",(x,playerRect.y),20,6))
             walkingLeft.draw(screen,(x,y))
         else:
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y),15,6))
+            particleDrawing.append(Particle("PlayerSprite/particle-test.png",(x,playerRect.y),15,6))
             walkingDown.draw(screen,(x,y))
     else:
         if lookAt=="Right":
@@ -186,6 +206,7 @@ while running:
     pygame.draw.rect(screen,(0,255,0),(70,50,10,10))
     pygame.draw.rect(screen,(0,0,255),(x,y,2,2))
     #End drawing
+
     pygame.display.flip()
     clock.tick(60)
 
