@@ -1,14 +1,25 @@
 import pygame
+import time
+
+#game varialbles
+HEIGHT=400
+WIDTH=600
+running=True
+speed=10
+pygame.init()
+screen = pygame.display.set_mode((600, 400))
+clock = pygame.time.Clock()
 
 class Particle:
     position=(0,0)
-
+    lastParticleDraw=time.time()
     def __init__(self,chemin,pos,offsetX,offsetY):
+        print(time.time())
         self.sheet=pygame.image.load(chemin).convert_alpha()
         self.offsetX=offsetX
         self.offsetY=offsetY
-        self.x=pos[0]
-        self.y=pos[1]
+        self.x=pos[0]+offsetX
+        self.y=pos[1]+offsetY
     def draw(self,surface):
         surface.blit(self.sheet,(self.x,self.y))
 
@@ -42,15 +53,6 @@ class AnimatedSprite:
             self.frame_index = 0
 
 
-
-#game varialbles
-HEIGHT=400
-WIDTH=600
-running=True
-speed=10
-pygame.init()
-screen = pygame.display.set_mode((600, 400))
-clock = pygame.time.Clock()
 
 #idle Sprites
 idleDown = AnimatedSprite("PlayerSprite/Unarmed/Idle.png", lignes=4, colonnes=12, vitesse=0.06, toAnimate=(0,1,0,5))
@@ -160,16 +162,16 @@ while running:
     #Drawing player
     if moving:
         if lookAt=="Right":
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y)))
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y),10,6))
             walkingRight.draw(screen,(x,y))
         elif lookAt=="Up":
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y)))
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y),15,6))
             walkingUp.draw(screen,(x,y))
         elif lookAt=="Left":
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y)))
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y),20,6))
             walkingLeft.draw(screen,(x,y))
         else:
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y)))
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y),15,6))
             walkingDown.draw(screen,(x,y))
     else:
         if lookAt=="Right":
@@ -182,7 +184,6 @@ while running:
             idleDown.draw(screen,(x,y))
     #On the player
     pygame.draw.rect(screen,(0,255,0),(70,50,10,10))
-    pygame.draw.rect(screen,(255,0,0),playerRect)
     pygame.draw.rect(screen,(0,0,255),(x,y,2,2))
     #End drawing
     pygame.display.flip()
