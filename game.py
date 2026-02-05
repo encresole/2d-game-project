@@ -3,11 +3,14 @@ import pygame
 class Particle:
     position=(0,0)
 
-    def __init__(self,chemin,pos):
+    def __init__(self,chemin,pos,offsetX,offsetY):
         self.sheet=pygame.image.load(chemin).convert_alpha()
-        self.position=pos
+        self.offsetX=offsetX
+        self.offsetY=offsetY
+        self.x=pos[0]
+        self.y=pos[1]
     def draw(self,surface):
-        surface.blit(self.sheet,self.position)
+        surface.blit(self.sheet,(self.x,self.y))
 
 class AnimatedSprite:
     def __init__(self, chemin, lignes, colonnes, toAnimate, vitesse=0.2):
@@ -130,6 +133,10 @@ while running:
     if keys[pygame.K_z]:
         dy -= 1
         lookAt = "Up"
+    if keys[pygame.K_p]:
+        # add variable for debug :
+        print("debug :")
+        print("x=",x," y=",y)
     
     if dx != 0 or dy != 0:
         moving = True
@@ -153,16 +160,16 @@ while running:
     #Drawing player
     if moving:
         if lookAt=="Right":
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(playerRect.x,playerRect.y)))
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y)))
             walkingRight.draw(screen,(x,y))
         elif lookAt=="Up":
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(playerRect.x,playerRect.y)))
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y)))
             walkingUp.draw(screen,(x,y))
         elif lookAt=="Left":
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(playerRect.x,playerRect.y)))
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y)))
             walkingLeft.draw(screen,(x,y))
         else:
-            particleDrawing.append(Particle("PlayerSprite/particle.png",(playerRect.x,playerRect.y)))
+            particleDrawing.append(Particle("PlayerSprite/particle.png",(x,playerRect.y)))
             walkingDown.draw(screen,(x,y))
     else:
         if lookAt=="Right":
@@ -175,7 +182,8 @@ while running:
             idleDown.draw(screen,(x,y))
     #On the player
     pygame.draw.rect(screen,(0,255,0),(70,50,10,10))
-
+    pygame.draw.rect(screen,(255,0,0),playerRect)
+    pygame.draw.rect(screen,(0,0,255),(x,y,2,2))
     #End drawing
     pygame.display.flip()
     clock.tick(60)
